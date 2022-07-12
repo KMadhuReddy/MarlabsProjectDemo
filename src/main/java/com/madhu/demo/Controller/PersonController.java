@@ -9,18 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import com.madhu.demo.model.Person;
 import com.madhu.demo.service.PersonService;
 
-
 @RestController
 public class PersonController {
 	@Autowired
 	private PersonService Personservice;
-
-
-//	@GetMapping("/Persons")
-//	public List<Person> getAllPerson() {
-//		List<Person> allPersonList = Personservice.getAllPerson();
-//		return allPersonList;
-//	}
 
 	@GetMapping("/Persons")
 	public ResponseEntity<?> getAllEmployees() {
@@ -35,18 +27,12 @@ public class PersonController {
 			}
 		} catch (Exception e) {
 
-			response = new ResponseEntity<String>("Unable to Fetch Person details",
-					HttpStatus.INTERNAL_SERVER_ERROR); // 500
+			response = new ResponseEntity<String>("Unable to Fetch Person details", HttpStatus.INTERNAL_SERVER_ERROR); // 500
 			e.printStackTrace();
 		}
 		return response;
 	}
 
-//	@GetMapping("/Persons/{PersonId}")
-//	public Person getPersonById(@PathVariable String PersonId) {
-//		Person PersonDetails = Personservice.getPersonById(Integer.parseInt(PersonId));  
-//		return PersonDetails;
-//	}
 	@GetMapping("/Persons/{PersonId}")
 	public ResponseEntity<?> getPersonById(int PersonId) {
 		ResponseEntity<?> response = null;
@@ -67,12 +53,6 @@ public class PersonController {
 		return response;
 	}
 
-//	@GetMapping("/Persons/Name/{Name}")
-//	public Person getPersonByName(@PathVariable String Name) {
-//		Person PersonDetails = Personservice.getPersonByName(Name.toString());
-//		return PersonDetails;
-//	}
-	
 	@GetMapping("/Persons/Name/{Name}")
 	public ResponseEntity<?> getPersonByName(String Name) {
 		ResponseEntity<?> response = null;
@@ -80,7 +60,7 @@ public class PersonController {
 
 			Person list = Personservice.getPersonByName(Name);
 			if (list != null) {
-				
+
 				response = new ResponseEntity<List<Person>>(HttpStatus.OK);
 			} else {
 				response = new ResponseEntity<String>("No Persons details Found with this Name:", HttpStatus.OK);

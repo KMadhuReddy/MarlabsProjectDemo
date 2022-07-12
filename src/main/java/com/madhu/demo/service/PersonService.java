@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.madhu.demo.model.Person;
+
 @Service
 @Component
 public class PersonService implements IPersonService {
