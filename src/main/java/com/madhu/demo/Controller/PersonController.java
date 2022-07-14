@@ -1,30 +1,61 @@
 package com.madhu.demo.Controller;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.madhu.demo.model.Person;
 import com.madhu.demo.service.PersonService;
 
 @RestController
+@RequestMapping(value = "/Person")
 public class PersonController {
 	@Autowired
 	private PersonService Personservice;
 
-	@GetMapping("/Persons")
-	public ResponseEntity<?> getAllEmployees() {
+	@GetMapping(value = { "/Persons", "/Persons/{PersonId}", "/Persons/Name/{Name}", "/Persons/Age/{Age}" })
+	public ResponseEntity<?> getPersonByProperty(@PathVariable Map<String, String> pathVariableMap) {
+
 		ResponseEntity<?> response = null;
 		try {
+			int PersonId = isEmpty(pathVariableMap.get("PersonId")) ? Integer.parseInt(pathVariableMap.get("PersonId"))
+					: 0;
+			String Name = pathVariableMap.get("Name");
+			int Age = isEmpty(pathVariableMap.get("Age")) ? Integer.parseInt(pathVariableMap.get("Age")) : 0;
 			List<Person> list = Personservice.getAllPerson();
-			if (list != null && !list.isEmpty()) {
+
+			if (PersonId != 0) {
+				response = new ResponseEntity<>(Personservice.getPersonById(PersonId), HttpStatus.OK);
+			}
+
+			else if ((Name) != null) {
+				response = new ResponseEntity<Person>(Personservice.getPersonByName(Name), HttpStatus.OK);
+			}
+
+			else if (Age != 0) {
+				response = new ResponseEntity<>(Personservice.getPersonByAge(Age), HttpStatus.OK);
+			}
+
+			else if (list != null && !list.isEmpty()) {
 				list.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
 				response = new ResponseEntity<List<Person>>(list, HttpStatus.OK);
-			} else {
+			}
+
+			else {
 				response = new ResponseEntity<String>("No Persons details Found", HttpStatus.OK);
 			}
+
 		} catch (Exception e) {
 
 			response = new ResponseEntity<String>("Unable to Fetch Person details", HttpStatus.INTERNAL_SERVER_ERROR); // 500
@@ -33,51 +64,10 @@ public class PersonController {
 		return response;
 	}
 
-	@GetMapping("/Persons/{PersonId}")
-	public ResponseEntity<?> getPersonById(int PersonId) {
-		ResponseEntity<?> response = null;
-		try {
-
-			Person list = Personservice.getPersonById(PersonId);
-			if (list != null) {
-				response = new ResponseEntity<List<Person>>(HttpStatus.OK);
-			} else {
-				response = new ResponseEntity<String>("No Persons details Found with this Id:", HttpStatus.OK);
-			}
-		} catch (Exception e) {
-
-			response = new ResponseEntity<String>("Unable to Fetch Person details please enter id as numeric value",
-					HttpStatus.INTERNAL_SERVER_ERROR); // 500
-			e.printStackTrace();
-		}
-		return response;
-	}
-
-	@GetMapping("/Persons/Name/{Name}")
-	public ResponseEntity<?> getPersonByName(String Name) {
-		ResponseEntity<?> response = null;
-		try {
-
-			Person list = Personservice.getPersonByName(Name);
-			if (list != null) {
-
-				response = new ResponseEntity<List<Person>>(HttpStatus.OK);
-			} else {
-				response = new ResponseEntity<String>("No Persons details Found with this Name:", HttpStatus.OK);
-			}
-		} catch (Exception e) {
-
-			response = new ResponseEntity<String>("Unable to Fetch Person details with that name",
-					HttpStatus.INTERNAL_SERVER_ERROR); // 500
-			e.printStackTrace();
-		}
-		return response;
-	}
-
-	@GetMapping("/Persons/Age/{Age}")
-	public Person getPersonByAge(@PathVariable String Age) {
-		Person PersonDetails = Personservice.getPersonByAge(Integer.parseInt(Age));
-		return PersonDetails;
+	private boolean isEmpty(String str) {
+		if (str != null && str.length() > 0)
+			return true;
+		return false;
 	}
 
 	@PostMapping(value = "/Persons")
